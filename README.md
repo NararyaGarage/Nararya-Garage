@@ -29,7 +29,7 @@ Nararya Garage JKT48 Discord Bot adalah bot Discord komprehensif untuk komunitas
 - 🎭 **Pemantauan Theater & Event**:
   - Jadwal theater terbaru
   - Notifikasi event
-  - Pengingat otomatis (6 jam sebelum event dan 30 menit sebelumnya)
+  - Pengingat otomatis (8 jam sebelum event dan 30 menit sebelumnya)
 
 - 🎮 **Game Interaktif JKT48**:
   - Tebak Nama Member JKT48
@@ -44,6 +44,13 @@ Nararya Garage JKT48 Discord Bot adalah bot Discord komprehensif untuk komunitas
   - Clear pesan
   - Pemantauan pesan
   - Automod dengan filter kata
+  - Welcome Message
+  - Goodbye Message
+  - Welcome Message
+  - Banned Message
+  - Booster Message
+  - Warning Messsage
+ - Donate Message
 
 - 🎫 **Sistem Tiket**:
   - Buat tiket dengan embeds dan button
@@ -52,7 +59,7 @@ Nararya Garage JKT48 Discord Bot adalah bot Discord komprehensif untuk komunitas
 
 - 🔄 **Utilitas Media**:
   - Unduh video/gambar dari sosial media
-  - Hapus background/watermark
+  - Hapus background/watermark Video & Foto
   - Edit media
 
 - 🎛️ **Webhook Kustom**:
@@ -72,6 +79,10 @@ Nararya Garage JKT48 Discord Bot adalah bot Discord komprehensif untuk komunitas
   - Konversi mata uang
   - Pencarian resep
   - Terjemahan multi-bahasa
+  - Mencari Waktu Indonesia & Dunia
+  - Informasi hari besar (Ramadhan,Hallowen,kartini,kemerdekaan indonesia,dll)
+  - Informasi sahur & buka puasa (khusus bulan ramadhan)
+  - Pengingat Hari Besar Ramadhan,Hallowen,kartini,kemerdekaan indonesia,dll)
 
 ## 📥 Instalasi
 
