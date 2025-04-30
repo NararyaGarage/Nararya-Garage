@@ -1,6 +1,6 @@
-// Service for handling IDN Live related functionality
+// Service for handling Showroom related functionality
 const { logger } = require('../utils/logger');
-const { scrapeIDNLive } = require('../utils/webScraper');
+const { scrapeShowroomLive } = require('../utils/webScraper');
 const { createLiveEmbed } = require('../utils/embedBuilder');
 const { getCurrentMembers } = require('../models/jkt48Members');
 const config = require('../config');
@@ -9,10 +9,10 @@ const config = require('../config');
 const currentlyLive = new Map();
 
 /**
- * Check for active IDN Live streams and send notifications
+ * Check for active Showroom streams and send notifications
  * @param {Client} client - Discord client
  */
-async function checkIDNLives(client) {
+async function checkShowroomLives(client) {
   try {
     // Get all current JKT48 members
     const members = getCurrentMembers();
@@ -22,12 +22,12 @@ async function checkIDNLives(client) {
     
     // Check each member's stream status
     for (const member of members) {
-      if (!member.idnLiveUrl) continue; // Skip if member doesn't have IDN Live URL
+      if (!member.showroomId) continue; // Skip if member doesn't have Showroom ID
       
       try {
-        const liveData = await scrapeIDNLive(member.idnLiveUrl);
+        const liveData = await scrapeShowroomLive(member.showroomId);
         
-        if (liveData) {
+        if (liveData && liveData.isLive) {
           // Member is currently live
           const isNewLive = !currentlyLive.has(member.id);
           
@@ -36,18 +36,29 @@ async function checkIDNLives(client) {
             ...liveData,
             memberId: member.id,
             memberName: member.nickName || member.fullName,
-            platform: 'IDN Live'
+            platform: 'Showroom'
           };
           
           // If this is a new live, send notification
           if (isNewLive) {
             await sendLiveStartNotification(client, fullLiveData);
             
-            // Add to currently live list with timestamp
+            // Add to currently live list with timestamp and initial data
             currentlyLive.set(member.id, {
               data: fullLiveData,
-              startTime: Date.now()
+              startTime: Date.now(),
+              initialViewers: fullLiveData.viewers || 0,
+              peakViewers: fullLiveData.viewers || 0,
+              initialGifts: fullLiveData.giftsReceived || 0,
+              initialGiftPoints: fullLiveData.giftPoints || 0
             });
+          } else {
+            // Update peak viewers
+            const liveInfo = currentlyLive.get(member.id);
+            if (fullLiveData.viewers > liveInfo.peakViewers) {
+              liveInfo.peakViewers = fullLiveData.viewers;
+              currentlyLive.set(member.id, liveInfo);
+            }
           }
           
           // Remove from ended lives list since they're still live
@@ -56,47 +67,69 @@ async function checkIDNLives(client) {
           // Member is not live
           // If they were previously live, they ended their stream
           if (currentlyLive.has(member.id)) {
-            const liveInfo = currentlyLive.get(member.id);
-            const duration = Math.floor((Date.now() - liveInfo.startTime) / 1000);
-            
-            // Add duration to the data
-            const liveDataWithDuration = {
-              ...liveInfo.data,
-              duration
-            };
-            
-            // Send end notification
-            await sendLiveEndNotification(client, liveDataWithDuration);
-            
-            // Remove from currently live
-            currentlyLive.delete(member.id);
+            await processEndedShowroom(client, member.id);
           }
         }
       } catch (error) {
-        logger.error(`Error checking IDN Live for member ${member.fullName}:`, error);
+        logger.error(`Error checking Showroom for member ${member.fullName}:`, error);
       }
     }
     
     // Process ended lives (in case a member wasn't checked due to an error)
-    for (const [memberId, liveInfo] of endedLives.entries()) {
+    for (const [memberId] of endedLives.entries()) {
       if (currentlyLive.has(memberId)) {
-        const duration = Math.floor((Date.now() - liveInfo.startTime) / 1000);
-        
-        // Add duration to the data
-        const liveDataWithDuration = {
-          ...liveInfo.data,
-          duration
-        };
-        
-        // Send end notification
-        await sendLiveEndNotification(client, liveDataWithDuration);
-        
-        // Remove from currently live
-        currentlyLive.delete(memberId);
+        await processEndedShowroom(client, memberId);
       }
     }
   } catch (error) {
-    logger.error('Error in checkIDNLives service:', error);
+    logger.error('Error in checkShowroomLives service:', error);
+  }
+}
+
+/**
+ * Process data for a member who ended their Showroom stream
+ * @param {Client} client - Discord client
+ * @param {string} memberId - Member ID
+ */
+async function processEndedShowroom(client, memberId) {
+  try {
+    const liveInfo = currentlyLive.get(memberId);
+    const duration = Math.floor((Date.now() - liveInfo.startTime) / 1000);
+    
+    // Calculate statistics
+    const viewerGrowth = liveInfo.peakViewers - liveInfo.initialViewers;
+    const giftsReceived = liveInfo.data.giftsReceived - liveInfo.initialGifts;
+    const giftPointsEarned = liveInfo.data.giftPoints - liveInfo.initialGiftPoints;
+    
+    // Calculate gifts value in Indonesian Rupiah (approximation)
+    const giftValueRupiah = giftPointsEarned * 10; // 1 gift point ≈ 10 IDR
+    
+    // Calculate percentage of free vs paid gifts (approximation)
+    const totalGiftPoints = liveInfo.data.giftPoints || 0;
+    const freeGiftPercentage = totalGiftPoints > 0 ? 
+      Math.floor((liveInfo.data.freeGiftPoints || 0) / totalGiftPoints * 100) : 0;
+    
+    // Add calculated data to the live data
+    const endData = {
+      ...liveInfo.data,
+      duration,
+      viewerGrowth,
+      giftsReceived,
+      giftPointsEarned,
+      giftsRupiah: giftValueRupiah,
+      totalGiftPoints: totalGiftPoints,
+      freeGiftPercentage: freeGiftPercentage
+    };
+    
+    // Send end notification
+    await sendLiveEndNotification(client, endData);
+    
+    // Remove from currently live list
+    currentlyLive.delete(memberId);
+    
+    logger.info(`${endData.memberName} ended their Showroom stream after ${formatDuration(duration)}`);
+  } catch (error) {
+    logger.error(`Error processing ended Showroom for member ID ${memberId}:`, error);
   }
 }
 
@@ -107,12 +140,12 @@ async function checkIDNLives(client) {
  */
 async function sendLiveStartNotification(client, liveData) {
   try {
-    // Find specific IDN Live notification channel from config
+    // Find specific Showroom notification channel from config
     for (const guild of client.guilds.cache.values()) {
       try {
         // Get channel ID from config
-        const idnLiveChannelId = config.channels.idnLiveNotifications;
-        const channel = guild.channels.cache.get(idnLiveChannelId);
+        const showroomChannelId = config.channels.showroomNotifications;
+        const channel = guild.channels.cache.get(showroomChannelId);
         
         // If channel not found in this guild, try fallback
         if (!channel) {
@@ -122,7 +155,7 @@ async function sendLiveStartNotification(client, liveData) {
           if (!fallbackChannel) continue; // Skip if no fallback
           
           // Create the embed for the notification
-          const embed = createLiveEmbed(liveData, 'IDN Live', true);
+          const embed = createLiveEmbed(liveData, 'Showroom', true);
           
           // Send with red line border styling
           const nonEmbed = `Selamat ${getTimeGreeting()}, ${liveData.memberName} ❤️ lagi live cuy!\nYuk Ditonton..`;
@@ -136,7 +169,7 @@ async function sendLiveStartNotification(client, liveData) {
         }
         
         // Create the embed for the notification with red line styling
-        const embed = createLiveEmbed(liveData, 'IDN Live', true);
+        const embed = createLiveEmbed(liveData, 'Showroom', true);
         
         // Send styled message
         const nonEmbed = `Selamat ${getTimeGreeting()}, ${liveData.memberName} ❤️ lagi live cuy!\nYuk Ditonton..`;
@@ -147,9 +180,9 @@ async function sendLiveStartNotification(client, liveData) {
         });
         
         // Log successful notification
-        logger.info(`Sent IDN Live notification for ${liveData.memberName} to channel ${channel.name}`);
+        logger.info(`Sent Showroom notification for ${liveData.memberName} to channel ${channel.name}`);
       } catch (error) {
-        logger.error(`Error sending IDN Live notification to guild ${guild.name}:`, error);
+        logger.error(`Error sending Showroom notification to guild ${guild.name}:`, error);
       }
     }
   } catch (error) {
@@ -164,12 +197,12 @@ async function sendLiveStartNotification(client, liveData) {
  */
 async function sendLiveEndNotification(client, liveData) {
   try {
-    // Find specific IDN Live notification channel from config
+    // Find specific Showroom notification channel from config
     for (const guild of client.guilds.cache.values()) {
       try {
         // Get channel ID from config
-        const idnLiveChannelId = config.channels.idnLiveNotifications;
-        const channel = guild.channels.cache.get(idnLiveChannelId);
+        const showroomChannelId = config.channels.showroomNotifications;
+        const channel = guild.channels.cache.get(showroomChannelId);
         
         // If channel not found in this guild, try fallback
         if (!channel) {
@@ -179,10 +212,10 @@ async function sendLiveEndNotification(client, liveData) {
           if (!fallbackChannel) continue; // Skip if no fallback
           
           // Create the embed for the notification
-          const embed = createLiveEmbed(liveData, 'IDN Live', false);
+          const embed = createLiveEmbed(liveData, 'Showroom', false);
           
           // Send with styling
-          const nonEmbed = `Terimakasih Banyak ${liveData.memberName} Sudah Menemani Hari Ini Dengan Live IDN Dan Sampai Jumpa Di Live Selanjutnya.`;
+          const nonEmbed = `Terimakasih Banyak ${liveData.memberName} Sudah Menemani Hari Ini Dengan Live Showroom Dan Sampai Jumpa Di Live Selanjutnya.`;
           
           await fallbackChannel.send({
             content: nonEmbed,
@@ -193,10 +226,10 @@ async function sendLiveEndNotification(client, liveData) {
         }
         
         // Create the embed for the notification
-        const embed = createLiveEmbed(liveData, 'IDN Live', false);
+        const embed = createLiveEmbed(liveData, 'Showroom', false);
         
         // Send styled message
-        const nonEmbed = `Terimakasih Banyak ${liveData.memberName} Sudah Menemani Hari Ini Dengan Live IDN Dan Sampai Jumpa Di Live Selanjutnya.`;
+        const nonEmbed = `Terimakasih Banyak ${liveData.memberName} Sudah Menemani Hari Ini Dengan Live Showroom Dan Sampai Jumpa Di Live Selanjutnya.`;
         
         await channel.send({
           content: nonEmbed,
@@ -204,9 +237,9 @@ async function sendLiveEndNotification(client, liveData) {
         });
         
         // Log successful notification
-        logger.info(`Sent IDN Live end notification for ${liveData.memberName} to channel ${channel.name}`);
+        logger.info(`Sent Showroom end notification for ${liveData.memberName} to channel ${channel.name}`);
       } catch (error) {
-        logger.error(`Error sending IDN Live end notification to guild ${guild.name}:`, error);
+        logger.error(`Error sending Showroom end notification to guild ${guild.name}:`, error);
       }
     }
   } catch (error) {
@@ -240,6 +273,20 @@ function formatDuration(seconds) {
 }
 
 /**
+ * Format a number as Indonesian Rupiah
+ * @param {number} amount - Amount to format
+ * @returns {string} Formatted Rupiah string
+ */
+function formatRupiah(amount) {
+  return new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  }).format(amount);
+}
+
+/**
  * Get appropriate greeting based on time of day
  * @returns {string} Time-based greeting
  */
@@ -258,5 +305,5 @@ function getTimeGreeting() {
 }
 
 module.exports = {
-  checkIDNLives
+  checkShowroomLives
 };
