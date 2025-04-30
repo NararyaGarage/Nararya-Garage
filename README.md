@@ -50,39 +50,61 @@ Nararya Garage JKT48 Discord Bot adalah bot Discord komprehensif untuk komunitas
   - Banned Message
   - Booster Message
   - Warning Messsage
- - Donate Message
+  - Donate Message
 
 - 🎫 **Sistem Tiket**:
-  - Buat tiket dengan embeds dan button
-  - Atur role support untuk tiket
-  - Arsip tiket otomatis
+  - Buat message embeded ticket & dan costume button or scroll down (Slash Commands)
+  - pembauatan message embeded khusus role tertentu
 
 - 🔄 **Utilitas Media**:
-  - Unduh video/gambar dari sosial media
-  - Hapus background/watermark Video & Foto
-  - Edit media
+  - Play (Slash Commands)
+  - Skip (scroll down)
+  - Mute (scroll down)
+  - Check Playlist (scroll down)
+  - Skip (scroll down)
+  - Pause (scroll down)
+  - Resume (scroll down)
+  - Up Volume (scroll down)
+  - Down Volume (scroll down)
+  - Up Audio (scroll down)
+  - 24jam hours (Slash Commands)
+  - back audio (scroll down)
+  - loop audio (scroll down)
+  - Support via all link sosial media & file users
+
+- 🔄 **Utilitas Media**:
+  - Unduh video/gambar dari sosial media (Slash Commands)
+  - Hapus background/watermark Video & Foto (Slash Commands)
+  - Edit media (Slash Commands)
+  - Support via all link sosial media & file users
 
 - 🎛️ **Webhook Kustom**:
-  - Buat webhook dengan banner
-  - Kirim pesan embed melalui bot
-  - Format pesan kustom
+  - Buat webhook dengan banner (Slash Commands)
+  - Kirim pesan embed melalui bot (Slash Commands)
+  - Format pesan kustom (Slash Commands)
 
 - 💰 **Sistem Ekonomi NGC**:
   - Mata uang server (NGC)
-  - Sistem belanja
-  - Transfer antar member
-  - Daily rewards
+  - Sistem belanja (Slash Commands)
+  - Transfer antar member (Slash Commands)
+  - Daily rewards (Slash Commands)
+  - leveling bot (Slash Commands)
+  - Sistem Bank (Slash Commands)
 
 - 🌍 **Fitur Utilitas Tambahan**:
-  - Cari film di Netflix, Disney+, dll
-  - Informasi cuaca Indonesia & dunia
-  - Konversi mata uang
-  - Pencarian resep
-  - Terjemahan multi-bahasa
-  - Mencari Waktu Indonesia & Dunia
-  - Informasi hari besar (Ramadhan,Hallowen,kartini,kemerdekaan indonesia,dll)
-  - Informasi sahur & buka puasa (khusus bulan ramadhan)
-  - Pengingat Hari Besar Ramadhan,Hallowen,kartini,kemerdekaan indonesia,dll)
+  - Cari film di Netflix, Disney+, dll (Slash Commands)
+  - Informasi cuaca Indonesia & dunia (Slash Commands)
+  - Konversi mata uang (Slash Commands)
+  - Pencarian resep (Slash Commands)
+  - Terjemahan multi-bahasa (Slash Commands)
+  - Mencari Waktu Indonesia & Dunia (Slash Commands)
+  - Notification hari besar (Ramadhan,Hallowen,kartini,kemerdekaan indonesia,dll)
+  - Notification sahur & buka puasa (khusus bulan ramadhan)
+  - Notification Pengingat Di Hari 0 Hari Besar (Ramadhan,Hallowen,kartini,kemerdekaan indonesia,dll)
+  - Skip link pendek (arahlink,safelinku,dll) (Slash Commands)
+  - dowload file (google drive,mediafire,dll) (Slash Commands)
+  - Check Avatar Users (Slash Commands)
+  - Check Users Levels (Slash Commands)
 
 ## 📥 Instalasi
 
