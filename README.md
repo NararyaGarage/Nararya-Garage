@@ -56,7 +56,7 @@ Nararya Garage JKT48 Discord Bot adalah bot Discord komprehensif untuk komunitas
   - Buat message embeded ticket & dan costume button or scroll down (Slash Commands)
   - pembauatan message embeded khusus role tertentu
 
-- 🔄 **Utilitas Media**:
+- 🎵 **Bot Music**:
   - Play (Slash Commands)
   - Skip (scroll down)
   - Mute (scroll down)
