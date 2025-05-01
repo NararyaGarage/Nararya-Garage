@@ -11,7 +11,7 @@
 Nararya Garage JKT48 Discord Bot adalah bot Discord komprehensif untuk komunitas penggemar JKT48 dan 48Group, menawarkan berbagai fitur untuk meningkatkan pengalaman komunitas Discord Anda. Bot ini dilengkapi dengan notifikasi realtime, pelacakan member, sistem ekonomi, permainan interaktif, dan banyak lagi.
 
 <div align="center">
-  <img src="https://media.discordapp.net/attachments/1297153787454296074/1341294189337378849/480416095_926454325972260_2363408671788321894_n.jpg" width="200" />
+  <img src="https://media.discordapp.net/attachments/1297153787454296074/1341294189337378849/480416095_926454325972260_2363408671788321894_n.jpg?ex=6813bc4e&is=68126ace&hm=48aea709e0c1d8ae42d24ab1693b4ee44be3805bb19e1121d09cad8bcc846a16&" width="200" />
 </div>
 
 ## ✨ Fitur Utama
@@ -142,6 +142,6 @@ Terima kasih kepada komunitas JKT48, Discord.js, dan semua kontributor yang tela
 ---
 
 <div align="center">
-  <img src="https://media.discordapp.net/attachments/1297153787454296074/1341294189337378849/480416095_926454325972260_2363408671788321894_n.jpg" width="100" />
+  <img src="https://media.discordapp.net/attachments/1297153787454296074/1341294189337378849/480416095_926454325972260_2363408671788321894_n.jpg?ex=6813bc4e&is=68126ace&hm=48aea709e0c1d8ae42d24ab1693b4ee44be3805bb19e1121d09cad8bcc846a16&" width="100" />
   <p>Dibuat dengan ❤️ oleh Nararya Garage Team</p>
 </div>
